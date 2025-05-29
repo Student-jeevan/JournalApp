@@ -17,6 +17,5 @@ public class UserArgumentprovider implements ArgumentsProvider {
                 Arguments.of(User.builder().userName("raju").password("raju"))
 
         );
-
     }
 }
