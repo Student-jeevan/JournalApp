@@ -17,10 +17,16 @@ public class Userservice {
     @Autowired
     private UserRepo userrep;
     private static final PasswordEncoder passwordencoder  = new BCryptPasswordEncoder();
-    public void savenewEntry(User user){
-        user.setPassword(passwordencoder.encode(user.getPassword()));
-        user.setRoles(Arrays.asList("USER"));
-        userrep.save(user);
+    public boolean savenewEntry(User user){
+       try{
+           user.setPassword(passwordencoder.encode(user.getPassword()));
+           user.setRoles(Arrays.asList("USER"));
+           userrep.save(user);
+           return true;
+       }
+       catch(Exception e){
+           return false;
+       }
 
     }
     public void saveAdmin(User user){
@@ -45,5 +51,4 @@ public class Userservice {
     public User findByUserName(String userName){
         return userrep.findByUserName(userName);
     }
-
 }
