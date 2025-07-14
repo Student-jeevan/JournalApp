@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class ConfigEntity
 {
     @Id
+    private String id;
     private String key;
     private String value;
 } 
