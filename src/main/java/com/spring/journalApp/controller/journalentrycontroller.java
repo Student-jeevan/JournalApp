@@ -1,5 +1,4 @@
 package com.spring.journalApp.controller;
-
 import com.spring.journalApp.entity.User;
 import com.spring.journalApp.entity.journalentry;
 import com.spring.journalApp.service.Userservice;
@@ -11,11 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/journal")
 public class journalentrycontroller {

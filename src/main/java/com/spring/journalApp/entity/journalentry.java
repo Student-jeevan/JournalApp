@@ -20,4 +20,4 @@ public class journalentry
     private String content;
     private LocalDateTime date;
 
-}
+} 
