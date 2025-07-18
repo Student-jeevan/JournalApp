@@ -5,13 +5,13 @@ import com.spring.journalApp.entity.journalentry;
 import com.spring.journalApp.enums.Sentiment;
 import com.spring.journalApp.repository.UserRepo;
 import com.spring.journalApp.repository.userRepoimpl;
+import com.spring.journalApp.repository.journalentryrepo;
 import com.spring.journalApp.service.EmailService;
 import com.spring.journalApp.service.SentimentAnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.swing.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -27,11 +27,26 @@ public class UserShedular {
     private userRepoimpl userreposit;
     @Autowired
     private SentimentAnalysisService sentimentService;
-    @Scheduled(cron = "0 0 9 * * SUN")
+    @Autowired
+    private journalentryrepo journalEntryRepo;
+    // @Scheduled(cron = "0 0 9 * * SUN")
     public void fetchAndSendMain(){
         List<User> users = userreposit.getUserforSA();
         for (User user : users) {
             List<journalentry> journalEntries = user.getJournals();
+            for (journalentry entry : journalEntries) {
+                if (entry.getSentiment() == null) {
+                    String sentimentStr = sentimentService.getSentiment(entry.getTitle() + " " + entry.getContent());
+                    Sentiment sentiment = null;
+                    try {
+                        sentiment = Sentiment.valueOf(sentimentStr);
+                    } catch (Exception e) {
+                        // fallback or log
+                    }
+                    entry.setSentiment(sentiment);
+                    journalEntryRepo.save(entry);
+                }
+            }
             List<Sentiment> sentiments = journalEntries.stream().filter(x -> x.getDate().isAfter(LocalDateTime.now().minus(7, ChronoUnit.DAYS))).map(x -> x.getSentiment()).collect(Collectors.toList());
             Map<Sentiment, Integer> sentimentCounts = new HashMap<>();
             for (Sentiment sentiment : sentiments) {
@@ -47,7 +62,7 @@ public class UserShedular {
                 }
             }
             if (mostFrequentSentiment != null) {
-                    emailService.sendmail(user.getEmail(), "Sentiment for previous week", mostFrequentSentiment.toString());
+                emailService.sendmail(user.getEmail(), "Sentiment for previous week", mostFrequentSentiment.toString());
             }
         }
     }
